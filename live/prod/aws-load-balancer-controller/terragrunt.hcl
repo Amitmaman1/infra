@@ -1,21 +1,27 @@
 terraform {
-  source  = "terraform-helm/helm-release/kubernetes"
-  version = "2.9.0"
+  source = "tfr://registry.terraform.io/terraform-helm/helm-release/kubernetes?version=2.9.0"
 }
 
 include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
+dependencies {
+  paths = ["../eks", "../aws-lb-controller-iam"]
+}
+
 dependency "eks" {
   config_path = "../eks"
+}
+
+dependency "iam" {
+  config_path = "../aws-lb-controller-iam"
 }
 
 generate "providers" {
   path      = "providers.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
-
 variable "cluster_name" {}
 variable "cluster_endpoint" {}
 variable "cluster_ca" {}
@@ -37,14 +43,13 @@ provider "helm" {
     token                  = data.aws_eks_cluster_auth.cluster.token
   }
 }
-
 EOF
 }
 
 inputs = {
-  cluster_name      = dependency.eks.outputs.cluster_name
-  cluster_endpoint  = dependency.eks.outputs.cluster_endpoint
-  cluster_ca        = dependency.eks.outputs.cluster_certificate_authority_data
+  cluster_name     = dependency.eks.outputs.cluster_name
+  cluster_endpoint = dependency.eks.outputs.cluster_endpoint
+  cluster_ca       = dependency.eks.outputs.cluster_certificate_authority_data
 
   name       = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
@@ -52,26 +57,17 @@ inputs = {
   version    = "1.6.2"
   namespace  = "kube-system"
 
-  set = [
-    {
-      name  = "clusterName"
-      value = dependency.eks.outputs.cluster_name
-    },
-    {
-      name  = "region"
-      value = "us-east-1"
-    },
-    {
-      name  = "vpcId"
-      value = dependency.eks.outputs.vpc_id
-    },
-    {
-      name  = "serviceAccount.create"
-      value = "false"
-    },
-    {
-      name  = "serviceAccount.name"
-      value = "aws-load-balancer-controller"
+  values = [{
+    clusterName = dependency.eks.outputs.cluster_name
+    region      = "us-east-1"
+    vpcId       = dependency.eks.outputs.vpc_id
+
+    serviceAccount = {
+      create = true
+      name   = "aws-load-balancer-controller"
+      annotations = {
+        "eks.amazonaws.com/role-arn" = dependency.iam.outputs.iam_role_arn
+      }
     }
-  ]
+  }]
 }

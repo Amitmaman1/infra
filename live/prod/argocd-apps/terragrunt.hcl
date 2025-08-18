@@ -6,9 +6,7 @@ include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
-dependencies {
-  paths = ["../eks"]
-}
+
 
 dependency "eks" {
   config_path = "../eks"
@@ -56,40 +54,27 @@ inputs = {
   values = [{
     applications = [
       {
-        name       = "my-app-dev"
+        name       = "my-app-prod"
         namespace  = "argocd"
         project    = "default"
         source     = {
           repoURL        = "https://github.com/Amitmaman1/gitops.git"
           targetRevision = "main"
           path           = "helm-charts/my-app"
-          helm           = { valueFiles = ["values-dev.yaml"] }
+          helm           = { valueFiles = ["values-prod.yaml"] }
         }
-        destination = { server = "https://kubernetes.default.svc", namespace = "dev" }
+        destination = { server = "https://kubernetes.default.svc", namespace = "prod" }
         syncPolicy  = { automated = { prune = true, selfHeal = true } }
       },
       {
-        name       = "my-app-staging"
-        namespace  = "argocd"
-        project    = "default"
-        source     = {
-          repoURL        = "https://github.com/Amitmaman1/gitops.git"
-          targetRevision = "main"
-          path           = "helm-charts/my-app"
-          helm           = { valueFiles = ["values-staging.yaml"] }
-        }
-        destination = { server = "https://kubernetes.default.svc", namespace = "staging" }
-        syncPolicy  = { automated = { prune = true, selfHeal = true } }
-      },
-      {
-        name       = "edge-alb-dev"
+        name       = "edge-alb-prod"
         namespace  = "argocd"
         project    = "default"
         source     = {
           repoURL        = "https://github.com/Amitmaman1/gitops.git"
           targetRevision = "main"
           path           = "helm-charts/edge-alb"
-          helm           = { valueFiles = ["values-dev.yaml"] }
+          helm           = { valueFiles = ["values-prod.yaml"] }
         }
         destination = { server = "https://kubernetes.default.svc", namespace = "ingress-nginx" }
         syncPolicy  = { automated = { prune = true, selfHeal = true } }

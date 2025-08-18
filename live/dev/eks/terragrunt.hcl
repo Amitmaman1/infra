@@ -1,6 +1,5 @@
 terraform {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "20.24.0"
+  source = "tfr://registry.terraform.io/terraform-aws-modules/eks/aws?version=21.0.0"
 }
 
 include "root" {
@@ -12,8 +11,8 @@ dependency "vpc" {
 }
 
 inputs = {
-  cluster_name    = "dev-eks"
-  cluster_version = "1.29"
+  name             = "dev-eks"  
+  cluster_version  = "1.29"
   vpc_id          = dependency.vpc.outputs.vpc_id
   subnet_ids      = dependency.vpc.outputs.private_subnets
 
