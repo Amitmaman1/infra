@@ -1,5 +1,5 @@
 terraform {
-  source = "tfr://registry.terraform.io/terraform-aws-modules/eks/aws?version=21.0.0"
+  source = "tfr:///terraform-aws-modules/eks/aws?version=21.0.0"
 }
 
 include "root" {

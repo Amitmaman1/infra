@@ -1,5 +1,5 @@
 terraform {
-  source = "tfr://registry.terraform.io/terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks?version=5.39.1"
+  source = "tfr://registry.terraform.io/terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks?version=6.1.1"
 }
 
 include "root" {

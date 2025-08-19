@@ -6,9 +6,6 @@ include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
-dependencies {
-  paths = ["../eks"]
-}
 
 dependency "eks" {
   config_path = "../eks"
