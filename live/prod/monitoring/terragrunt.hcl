@@ -56,7 +56,7 @@ inputs = {
   values = [{
     grafana = {
       service = { type = "LoadBalancer" }
-      adminPassword = "admin123"
+      adminPassword = "admin123" # will add to aws secrets
     }
   }]
 }
